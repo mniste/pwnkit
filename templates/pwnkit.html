@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Pwnkit Plugin</title>
+    </head>
+
+    <body>
+
+        <h1>Pwnkit Plugin</h1>
+
+        <div x-data="alpineHello()" x-init="initPage()">
+            <form>
+                <div id="select-agent">
+                    <select x-model="selectedAgentPaw">
+                        <option value="" disabled selected>Select an agent</option>
+                        <template x-for="agent of agents" :key="agent.paw">
+                            <option x-bind:value="agent.paw" x-text="`${agent.host} - ${agent.paw}`"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <br>
+                <br>
+
+                <button @click="execute()">Execute Pwnkit</button>
+            </form>
+
+            <br>
+            <br>
+
+        </div>
+
+    </body>
+
+</html>
+
+
+
+
+<script>
+    function alpineHello() {
+        return {
+            agents: [],
+            selectedAgentPaw: '',
+
+            initPage() {
+                // send GET request to get all agents to fill in agents list
+                apiV2('GET', '/api/v2/agents').then((response) => {
+                    this.agents = response;
+                    console.log('All agents retrieved.');
+                }).catch((error) => {
+                    console.error(error);
+                });
+            },
+
+            execute() {
+                // executes the task function
+                apiV2('POST', '/plugin/pwnkit/manualcommand', {
+                    "paw": this.selectedAgentPaw
+                }).then((response) => {
+                    console.log('Agent has been tasked with the command.');
+                }).catch((error) => {
+                    console.error(error);
+                });
+            }
+
+        }
+    }
+</script>
